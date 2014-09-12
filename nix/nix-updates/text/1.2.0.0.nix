@@ -9,6 +9,7 @@ cabal.mkDerivation (self: {
   version = "1.2.0.0";
   sha256 = "0c681yaqq68imj77qzy0j4iag8q90mhnnaalfwc08nzv8cr6c8z6";
   buildDepends = [ deepseq ];
+ doCheck = false;
   testDepends = [
     deepseq HUnit QuickCheck random testFramework testFrameworkHunit
     testFrameworkQuickcheck2
