@@ -1,0 +1,104 @@
+## Commonly Used Repos
+## Include these in the sample file for new contributors
+
+[core]
+checkout = git clone 'git@github.com:diagrams/diagrams-core.git' 'core'
+
+[lib]
+checkout = git clone 'git@github.com:diagrams/diagrams-lib.git' 'lib'
+
+[contrib]
+checkout = git clone 'git@github.com:diagrams/diagrams-contrib.git' 'contrib'
+
+[doc]
+checkout = git clone 'git@github.com:diagrams/diagrams-doc.git' 'doc'
+
+[svg]
+checkout = git clone 'git@github.com:diagrams/diagrams-svg.git' 'svg'
+
+[cairo]
+checkout = git clone 'git@github.com:diagrams/diagrams-cairo.git' 'cairo'
+
+[postscript]
+checkout = git clone 'git@github.com:diagrams/diagrams-postscript.git' 'postscript'
+
+[test]
+checkout = git clone 'git@github.com:diagrams/diagrams-test.git' 'test'
+
+## More Repos
+## Most contributors will not want to check out all of these; at most 1 or 2
+
+## Small upstream dependencies I help maintain
+
+[dual-tree]
+checkout = git clone 'git@github.com:diagrams/dual-tree.git' 'dual-tree'
+
+[monoid-extras]
+checkout = git clone 'git@github.com:diagrams/monoid-extras.git' 'monoid-extras'
+
+[vector-space-points]
+checkout = git clone 'git@github.com:diagrams/vector-space-points.git' 'vector-space-points'
+
+[force-layout]
+checkout = git clone 'git@github.com:diagrams/force-layout.git' 'force-layout'
+
+[active]
+checkout = git clone 'git@github.com:diagrams/active.git' 'active'
+
+[palette]
+checkout = git clone 'git@github.com:diagrams/palette.git' 'palette'
+
+## Less mature Backends
+
+[povray]
+checkout = git clone 'git@github.com:diagrams/diagrams-povray.git' 'povray'
+
+[opengl]
+checkout = git clone 'git@github.com:bergey/diagrams-opengl.git' 'opengl'
+
+[rasterific]
+checkout = git clone 'git@github.com:diagrams/diagrams-rasterific.git' 'rasterific'
+
+[canvas]
+checkout = git clone 'git@github.com:diagrams/diagrams-canvas.git' 'canvas'
+
+[openscad]
+checkout = git clone 'git@github.com:bergey/diagrams-openscad.git' 'openscad'
+
+[gtk]
+checkout = git clone 'git@github.com:diagrams/diagrams-gtk.git' 'gtk'
+
+## Other Stuff
+
+[docutils]
+checkout = git clone 'git@github.com:diagrams/docutils.git' 'docutils'
+
+[builder]
+checkout = git clone 'git@github.com:diagrams/diagrams-builder.git' 'builder'
+
+[backend-tests]
+checkout = git clone 'git@github.com:diagrams/diagrams-backend-tests.git' 'backend-tests'
+
+[haddock]
+checkout = git clone 'git@github.com:diagrams/diagrams-haddock.git' 'haddock'
+
+[travis]
+checkout = git clone 'git@github.com:diagrams/diagrams-travis.git' 'travis'
+
+[SVGFonts]
+checkout = git clone 'git@github.com:diagrams/SVGFonts.git' 'SVGFonts'
+
+[org-babel]
+checkout = git clone 'git@github.com:bergey/org-babel-diagrams.git' 'org-babel'
+
+[statestack]
+checkout = git clone 'git@github.com:diagrams/statestack.git' 'statestack'
+
+[constraints]
+checkout = git clone 'git@github.com:diagrams/diagrams-constraints.git' 'constraints'
+
+[bench]
+checkout = git clone 'git@github.com:diagrams/diagrams-bench.git' 'bench'
+
+[linear]
+checkout = git clone 'git@github.com:ekmett/linear.git' 'linear'
