@@ -3,11 +3,11 @@
 let 
   tmpHaskellPkgs= haskellPackages.override {
         extension = self: super: {
-        diagramsCore = self.callPackage ./. {};
+          docutils = self.callPackage ./. {};
       };
     };
   in let
      haskellPackages = tmpHaskellPkgs;
-     in pkgs.lib.overrideDerivation haskellPackages.diagramsCore (attrs: {
+     in pkgs.lib.overrideDerivation haskellPackages.docutils (attrs: {
        buildInputs = [ haskellPackages.cabalInstall ] ++ attrs.buildInputs;
  })

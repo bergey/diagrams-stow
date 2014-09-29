@@ -9,7 +9,7 @@
 
 cabal.mkDerivation (self: {
   pname = "diagrams-contrib";
-  version = "1.1.2.2";
+  version = "1.1.2";
   src = ./.;
   buildDepends = [
     arithmoi circlePacking colour dataDefault dataDefaultClass
