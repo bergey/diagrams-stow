@@ -2,9 +2,8 @@
 
 { cabal, ansiTerminal, base64Bytestring, blazeSvg, Cabal
 , cautiousFile, cmdargs, cpphs, diagramsBuilder, diagramsLib
-, diagramsSvg, filepath, haskellSrcExts, lens, mtl, parsec
+, diagramsSvg, filepath, haskellSrcExts, lens, linear, mtl, parsec
 , QuickCheck, split, strict, tasty, tastyQuickcheck, text, uniplate
-, vectorSpace
 }:
 
 cabal.mkDerivation (self: {
@@ -16,8 +15,7 @@ cabal.mkDerivation (self: {
   buildDepends = [
     ansiTerminal base64Bytestring blazeSvg Cabal cautiousFile cmdargs
     cpphs diagramsBuilder diagramsLib diagramsSvg filepath
-    haskellSrcExts lens mtl parsec split strict text uniplate
-    vectorSpace
+    haskellSrcExts lens linear mtl parsec split strict text uniplate
   ];
   testDepends = [
     haskellSrcExts lens parsec QuickCheck tasty tastyQuickcheck

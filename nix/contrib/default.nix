@@ -2,9 +2,9 @@
 
 { cabal, arithmoi, circlePacking, colour, dataDefault
 , dataDefaultClass, diagramsCore, diagramsLib, forceLayout, HUnit
-, lens, MonadRandom, mtl, parsec, QuickCheck, semigroups, split
-, testFramework, testFrameworkHunit, testFrameworkQuickcheck2, text
-, vectorSpace, vectorSpacePoints
+, lens, linear, MonadRandom, mtl, parsec, QuickCheck, random
+, semigroups, split, testFramework, testFrameworkHunit
+, testFrameworkQuickcheck2, text
 }:
 
 cabal.mkDerivation (self: {
@@ -13,8 +13,8 @@ cabal.mkDerivation (self: {
   src = ./.;
   buildDepends = [
     arithmoi circlePacking colour dataDefault dataDefaultClass
-    diagramsCore diagramsLib forceLayout lens MonadRandom mtl parsec
-    semigroups split text vectorSpace vectorSpacePoints
+    diagramsCore diagramsLib forceLayout lens linear MonadRandom mtl
+    parsec random semigroups split text
   ];
   testDepends = [
     diagramsLib HUnit QuickCheck testFramework testFrameworkHunit

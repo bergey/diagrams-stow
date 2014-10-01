@@ -2,16 +2,16 @@
 
 { cabal, blankCanvas, cmdargs, dataDefaultClass, diagramsCore
 , diagramsLib, lens, mtl, NumInstances, optparseApplicative
-, statestack, text, vectorSpace
+, statestack, text
 }:
 
 cabal.mkDerivation (self: {
   pname = "diagrams-canvas";
-  version = "0.3";
+  version = "0.2.0.2";
   src = ./.;
   buildDepends = [
     blankCanvas cmdargs dataDefaultClass diagramsCore diagramsLib lens
-    mtl NumInstances optparseApplicative statestack text vectorSpace
+    mtl NumInstances optparseApplicative statestack text
   ];
   meta = {
     homepage = "http://projects.haskell.org/diagrams/";
