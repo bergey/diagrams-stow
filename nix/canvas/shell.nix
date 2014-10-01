@@ -9,6 +9,8 @@ let
         blankCanvas = self.callPackage /home/bergey/code/nixHaskellVersioned/blank-canvas/0.5.nix {};
         kansasComet= self.callPackage /home/bergey/code/nixHaskellVersioned/kansas-comet/0.3.1.nix {};
         # HEAD packages
+        monoidExtras = self.callPackage ../../../monoid-extras {};
+        active = self.callPackage ../../../active {};
         diagramsCore = self.callPackage ../../../core {};
         diagramsLib = self.callPackage ../../../lib {};
         # self
