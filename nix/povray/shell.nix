@@ -1,9 +1,10 @@
 let pkgs = import <nixpkgs> {};
     haskellPackages = pkgs.haskellPackages.override {
       extension = self: super: {
-        fsnotify = self.callPackage ../nix-updates/fsnotify/0.1.0.3.nix {};
+        fsnotify = self.callPackage /home/bergey/code/nixHaskellVersioned/fsnotify/0.1.0.3.nix {};
+        concurrentSupply = self.callPackage  /home/bergey/code/nixHaskellVersioned/concurrent-supply/0.1.7.nix {};
         linear = self.callPackage ../../../linear {};
-        optparseApplicative = self.callPackage ../nix-updates/optparse-applicative/0.10.0 {};
+        optparseApplicative = self.callPackage  /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.11.0.1.nix {};
         diagramsCore= self.callPackage ../../../core {};
         diagramsLib= self.callPackage ../../../lib {};
         diagramsPovray = self.callPackage ./. {};

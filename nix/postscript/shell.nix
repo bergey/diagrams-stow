@@ -7,14 +7,16 @@ let
         fsnotify = self.callPackage /home/bergey/code/nixHaskellVersioned/fsnotify/0.1.0.3.nix {};
         optparseApplicative = self.callPackage /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.10.0 {};
         # HEAD packages
+        monoidExtras = self.callPackage ../../../monoid-extras {};
+        active = self.callPackage ../../../active {};
         diagramsCore= self.callPackage ../../../core {};
         diagramsLib= self.callPackage ../../../lib {};
         # self
-        diagramsCairo = self.callPackage ./. {};
+        diagramsPostscript = self.callPackage ./. {};
       };
     };
   in let
      haskellPackages = tmpHaskellPkgs;
-     in pkgs.lib.overrideDerivation haskellPackages.diagramsCairo (attrs: {
+     in pkgs.lib.overrideDerivation haskellPackages.diagramsPostscript (attrs: {
        buildInputs = [ haskellPackages.cabalInstall ] ++ attrs.buildInputs;
  })
