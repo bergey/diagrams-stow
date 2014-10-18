@@ -16,10 +16,12 @@ let
           haskellSrcExts = self.callPackage /home/bergey/code/nixHaskellVersioned/haskell-src-exts/1.16.0.nix {};
           hlint= self.callPackage /home/bergey/code/nixHaskellVersioned/hlint/1.9.5.nix {};
           fsnotify = self.callPackage /home/bergey/code/nixHaskellVersioned/fsnotify/0.1.0.3.nix {};            
-          optparseApplicative = self.callPackage /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.10.0 {};
-          diagramsBuilder = self.callPackage ../builder {};
-          diagramsCore= self.callPackage ../core {};
-          diagramsLib = self.callPackage ../lib {};           
+          optparseApplicative = self.callPackage /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.11.0.1.nix {};
+          tasty = self.callPackage /home/bergey/code/nixHaskellVersioned/tasty/0.10.0.2.nix {};
+          diagramsBuilder = self.callPackage ../../../builder {};
+          diagramsCore= self.callPackage ../../../core {};
+          diagramsLib = self.callPackage ../../../lib {};
+          diagramsCairo = self.callPackage ../../../cairo {};
       };
     };
   in let
