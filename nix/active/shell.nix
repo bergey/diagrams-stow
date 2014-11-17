@@ -1,13 +1,14 @@
 { pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellPackages }:
 
 let 
-  tmpHaskellPkgs= haskellPackages.override {
-        extension = self: super: {
-         active = self.callPackage ./. {};
+  hs = haskellPackages.override {
+        extension = self: super: rec {
+          hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+          lens = hsPkg "lens" "4.6";
+          thisPackage = self.callPackage ./. {};
       };
     };
-  in let
-     haskellPackages = tmpHaskellPkgs;
-     in pkgs.lib.overrideDerivation haskellPackages.active (attrs: {
-       buildInputs = [ haskellPackages.cabalInstall ] ++ attrs.buildInputs;
+  in
+      pkgs.lib.overrideDerivation hs.thisPackage (attrs: {
+       buildInputs = [hs.cabalInstall ] ++ attrs.buildInputs;
  })

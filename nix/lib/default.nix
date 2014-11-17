@@ -3,8 +3,8 @@
 { cabal, active, adjunctions, colour, dataDefaultClass
 , diagramsCore, distributive, dualTree, filepath, fingertree
 , fsnotify, hashable, intervals, JuicyPixels, lens, linear
-, monoidExtras, optparseApplicative, safe, semigroups
-, systemFilepath, tagged, text
+, monoidExtras, mtl, optparseApplicative, semigroups
+, systemFilepath, tagged, text, unorderedContainers
 }:
 
 cabal.mkDerivation (self: {
@@ -14,8 +14,9 @@ cabal.mkDerivation (self: {
   buildDepends = [
     active adjunctions colour dataDefaultClass diagramsCore
     distributive dualTree filepath fingertree fsnotify hashable
-    intervals JuicyPixels lens linear monoidExtras optparseApplicative
-    safe semigroups systemFilepath tagged text
+    intervals JuicyPixels lens linear monoidExtras mtl
+    optparseApplicative semigroups systemFilepath tagged text
+    unorderedContainers
   ];
   meta = {
     homepage = "http://projects.haskell.org/diagrams";
