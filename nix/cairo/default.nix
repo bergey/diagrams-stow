@@ -2,17 +2,17 @@
 
 { cabal, cairo, colour, dataDefaultClass, diagramsCore, diagramsLib
 , filepath, hashable, JuicyPixels, lens, mtl, optparseApplicative
-, pango, split, statestack, transformers, vector
+, pango, split, statestack, time, transformers, vector
 }:
 
 cabal.mkDerivation (self: {
   pname = "diagrams-cairo";
-  version = "1.2";
+  version = "1.2.0.4";
   src = ./.;
   buildDepends = [
     cairo colour dataDefaultClass diagramsCore diagramsLib filepath
     hashable JuicyPixels lens mtl optparseApplicative pango split
-    statestack transformers vector
+    statestack time transformers vector
   ];
   meta = {
     homepage = "http://projects.haskell.org/diagrams";

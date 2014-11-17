@@ -10,7 +10,7 @@ let
         # # HEAD packages
         # monoidExtras = self.callPackage ../../../monoid-extras {};
         # active = self.callPackage ../../../active {};
-        # diagramsCore= self.callPackage ../../../core {};
+        diagramsCore= self.callPackage ../../../core {};
         thisPackage = self.callPackage ./. {};
       };
     };

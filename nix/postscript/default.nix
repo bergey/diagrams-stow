@@ -7,7 +7,7 @@
 
 cabal.mkDerivation (self: {
   pname = "diagrams-postscript";
-  version = "1.1.0.1";
+  version = "1.1.0.2";
   src = ./.;
   buildDepends = [
     dataDefaultClass diagramsCore diagramsLib dlist filepath hashable

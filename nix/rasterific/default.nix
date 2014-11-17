@@ -2,17 +2,17 @@
 
 { cabal, dataDefaultClass, diagramsCore, diagramsLib, filepath
 , FontyFruity, JuicyPixels, lens, mtl, optparseApplicative
-, Rasterific, split, statestack
+, Rasterific, split, statestack, time
 }:
 
 cabal.mkDerivation (self: {
   pname = "diagrams-rasterific";
-  version = "0.1";
+  version = "0.1.0.4";
   src = ./.;
   buildDepends = [
     dataDefaultClass diagramsCore diagramsLib filepath FontyFruity
     JuicyPixels lens mtl optparseApplicative Rasterific split
-    statestack
+    statestack time
   ];
   meta = {
     homepage = "http://projects.haskell.org/diagrams/";

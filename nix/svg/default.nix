@@ -2,17 +2,17 @@
 
 { cabal, base64Bytestring, blazeMarkup, blazeSvg, colour
 , diagramsCore, diagramsLib, filepath, hashable, JuicyPixels, lens
-, monoidExtras, mtl, optparseApplicative, split, time, vectorSpace
+, monoidExtras, mtl, split, time, vectorSpace
 }:
 
 cabal.mkDerivation (self: {
   pname = "diagrams-svg";
-  version = "1.1";
+  version = "1.1.0.2";
   src = ./.;
   buildDepends = [
     base64Bytestring blazeMarkup blazeSvg colour diagramsCore
     diagramsLib filepath hashable JuicyPixels lens monoidExtras mtl
-    optparseApplicative split time vectorSpace
+    split time vectorSpace
   ];
   meta = {
     homepage = "http://projects.haskell.org/diagrams/";
