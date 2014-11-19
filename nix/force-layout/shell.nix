@@ -2,7 +2,9 @@
 
 let 
   tmpHaskellPkgs= haskellPackages.override {
-        extension = self: super: {
+    extension = self: super: rec {
+        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+        lens = hsPkg "lens" "4.6";
         forceLayout = self.callPackage ./. {};
       };
     };

@@ -2,14 +2,9 @@
 
 let
      hs = haskellPackages.override {
-      extension = self: super: {
-        # required, not in Nix
-        # fsnotify = self.callPackage /home/bergey/code/nixHaskellVersioned/fsnotify/0.1.0.3.nix {};
-        # optparseApplicative = self.callPackage /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.11.0.1.nix {};
-        # # newer than in Nix
-        # # HEAD packages
-        # monoidExtras = self.callPackage ../../../monoid-extras {};
-        # active = self.callPackage ../../../active {};
+     extension = self: super: rec {
+        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+        lens = hsPkg "lens" "4.6";
         diagramsCore= self.callPackage ../../../core {};
         thisPackage = self.callPackage ./. {};
       };

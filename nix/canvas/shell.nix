@@ -2,18 +2,19 @@
 
 let 
   tmpHaskellPkgs= haskellPackages.override {
-        extension = self: super: {
+    extension = self: super: rec {
+        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
         # required, not in Nix
-        fsnotify = self.callPackage /home/bergey/code/nixHaskellVersioned/fsnotify/0.1.0.3.nix {};
-        optparseApplicative = self.callPackage /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.11.0.1.nix {};
-        tasty = self.callPackage /home/bergey/code/nixHaskellVersioned/tasty/0.10.0.2.nix {};
-         blankCanvas = self.callPackage /home/bergey/code/nixHaskellVersioned/blank-canvas/0.5.nix {};
+        fsnotify = hsPkg "fsnotify" "0.1.0.3";
+        optparseApplicative = hsPkg "optparse-applicative" "0.11.0.1";
+        blankCanvas = self.callPackage /home/bergey/code/nixHaskellVersioned/blank-canvas/0.5.nix {};
         kansasComet= self.callPackage /home/bergey/code/nixHaskellVersioned/kansas-comet/0.3.1.nix {};
-        # newer versions
-        tasty = self.callPackage /home/bergey/code/nixHaskellVersioned/tasty/0.10.0.1.nix {};
+        # newer than Nix
+        lens = hsPkg "lens" "4.6"; 
+        tasty = hsPkg "tasty" "0.10.1";
         # HEAD packages
-        monoidExtras = self.callPackage ../../../monoid-extras {};
-        active = self.callPackage ../../../active {};
+        # monoidExtras = self.callPackage ../../../monoid-extras {};
+        # active = self.callPackage ../../../active {};
         diagramsCore = self.callPackage ../../../core {};
         diagramsLib = self.callPackage ../../../lib {};
         # self
