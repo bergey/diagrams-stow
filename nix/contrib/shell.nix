@@ -8,7 +8,8 @@ let
         fsnotify = hsPkg "fsnotify" "0.1.0.3";
         optparseApplicative = hsPkg "optparse-applicative" "0.11.0.1";
         # newer than Nix
-        lens = hsPkg "lens" "4.6";
+        # lens = hsPkg "lens" "4.6";
+        linear = hsPkg "linear" "1.15.2";
         # HEAD packages
         active = self.callPackage ../../../active {};
         forceLayout = self.callPackage ../../../force-layout {};
