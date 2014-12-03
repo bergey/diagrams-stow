@@ -2,21 +2,16 @@
 
 let 
    hs = haskellPackages.override {
-        extension = self: super: {
+        extension = self: super: rec {
+        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
         # required, not in Nix
-        # fsnotify = self.callPackage /home/bergey/code/nixHaskellVersioned/fsnotify/0.1.0.3.nix {};
-        # optparseApplicative = self.callPackage /home/bergey/code/nixHaskellVersioned/optparse-applicative/0.11.0.1.nix {};
-        # tasty = self.callPackage /home/bergey/code/nixHaskellVersioned/tasty/0.10.0.2.nix {};
-        # haskellSrcExts = self.callPackage /home/bergey/code/nixHaskellVersioned/haskell-src-exts/1.16.0.nix {};
-        # hlint= self.callPackage /home/bergey/code/nixHaskellVersioned/hlint/1.9.5.nix {};
         # lens = pkgs.lib.overrideDerivation super.lens (attrs: {
         #       doCheck = false;
         #     });
-        # network = self.callPackage /home/bergey/code/nixHaskellVersioned/network/2.6.0.2.nix {};
-        # pandocCiteproc = self.callPackage /home/bergey/code/nixHaskellVersioned/pandoc-citeproc/0.4.0.1.nix {};
         # hakyll = pkgs.lib.overrideDerivation (self.callPackage /home/bergey/code/nixHaskellVersioned/hakyll/4.5.4.0.nix {}) (attrs: {
         #   doCheck = false;
         # });
+        linear = hsPkg "linear" "1.15.4";
         # HEAD packages
         monoidExtras = self.callPackage ../../../monoid-extras {};
         active = self.callPackage ../../../active {};
@@ -28,7 +23,7 @@ let
         diagramsPostscript = self.callPackage ../../../postscript {};
         diagramsSvg = self.callPackage ../../../svg {};
         diagramsBuilder = self.callPackage ../../../builder {};
-        svgFonts = self.callPackage ../../../SVGFonts {};
+        SVGFonts = self.callPackage ../../../SVGFonts {};
         hsDocutils = self.callPackage ../../../docutils {};
         palette = self.callPackage ../../../palette {};
         # self
@@ -37,5 +32,5 @@ let
     };
          in 
           pkgs.lib.overrideDerivation hs.thisPackage (attrs: {
-                 buildInputs = [hs.cabalInstall pkgs.python33Packages.docutils ] ++ attrs.buildInputs;
+                 buildInputs = [hs.cabalInstall pkgs.python33Packages.docutils pkgs.python33Packages.pygments ] ++ attrs.buildInputs;
            })
