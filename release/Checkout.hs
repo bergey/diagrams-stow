@@ -24,7 +24,9 @@ checkout (dir, branch) = chdir dir $
 
 branches :: [(FilePath, Text)]
 branches =
-    [ ("core", "core-1.2")
+    [ ("active", "active-0.1")
+    , ("force-layout", "force-layout-0.3")
+    , ("core", "core-1.2")
     , ("lib", "lib-1.2")
     , ("contrib", "contrib-1.1")
     , ("cairo", "cairo-1.2")

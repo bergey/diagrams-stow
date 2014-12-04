@@ -2,8 +2,10 @@
 
 let 
   tmpHaskellPkgs= haskellPackages.override {
-        extension = self: super: {
+        extension = self: super: rec {
+        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
         dualTree = self.callPackage ./. {};
+        semigroups = hsPkg "semigroups" "0.16";
       };
     };
   in let
