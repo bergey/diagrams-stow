@@ -5,13 +5,6 @@ let
         extension = self: super: rec {
         hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
         # required, not in Nix
-        # lens = pkgs.lib.overrideDerivation super.lens (attrs: {
-        #       doCheck = false;
-        #     });
-        # hakyll = pkgs.lib.overrideDerivation (self.callPackage /home/bergey/code/nixHaskellVersioned/hakyll/4.5.4.0.nix {}) (attrs: {
-        #   doCheck = false;
-        # });
-        linear = hsPkg "linear" "1.15.4";
         # HEAD packages
         monoidExtras = self.callPackage ../../../monoid-extras {};
         active = self.callPackage ../../../active {};
