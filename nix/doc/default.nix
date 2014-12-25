@@ -9,9 +9,10 @@ cabal.mkDerivation (self: {
   src = ./.;
   isLibrary = false;
   isExecutable = true;
+  noHaddock = true;
   buildDepends = [
     cmdargs diagramsBuilder hsDocutils hakyll safe shake diagramsCore
-    active diagramsLib diagramsContrib SVGFonts
+    active diagramsLib diagramsContrib SVGFonts palette
   ];
   meta = {
     license = self.stdenv.lib.licenses.bsd3;
