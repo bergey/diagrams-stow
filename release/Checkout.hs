@@ -31,7 +31,7 @@ branches =
     , ("postscript", "postscript-1.1")
     , ("rasterific", "rasterific-0.1")
     , ("svg", "svg-1.1")
-    , ("SVGFonts", "SVGFonts-1.3")
+    , ("SVGFonts", "master")
     , ("builder", "builder-0.6")
     , ("haddock", "haddock-0.2")
     , ("stow", "release")
