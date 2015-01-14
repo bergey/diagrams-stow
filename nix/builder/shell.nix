@@ -6,6 +6,8 @@ let
         hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
         # required, not in Nix
         # newer versions
+        lens = hsPkg "lens" "4.7";
+        linear = hsPkg "linear" "1.16";
         # HEAD packages        
         monoidExtras = self.callPackage ../../../monoid-extras {};
         active = self.callPackage ../../../active {};
