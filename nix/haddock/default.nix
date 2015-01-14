@@ -2,20 +2,22 @@
 
 { cabal, ansiTerminal, base64Bytestring, blazeSvg, Cabal
 , cautiousFile, cmdargs, cpphs, diagramsBuilder, diagramsLib
-, diagramsSvg, filepath, haskellSrcExts, lens, linear, mtl, parsec
+, diagramsSvg, filepath, haskellSrcExts, lens, mtl, parsec
 , QuickCheck, split, strict, tasty, tastyQuickcheck, text, uniplate
+, vectorSpace
 }:
 
 cabal.mkDerivation (self: {
   pname = "diagrams-haddock";
-  version = "0.2.2.8";
+  version = "0.2.2.12";
   src = ./.;
   isLibrary = true;
   isExecutable = true;
   buildDepends = [
     ansiTerminal base64Bytestring blazeSvg Cabal cautiousFile cmdargs
     cpphs diagramsBuilder diagramsLib diagramsSvg filepath
-    haskellSrcExts lens linear mtl parsec split strict text uniplate
+    haskellSrcExts lens mtl parsec split strict text uniplate
+    vectorSpace
   ];
   testDepends = [
     haskellSrcExts lens parsec QuickCheck tasty tastyQuickcheck

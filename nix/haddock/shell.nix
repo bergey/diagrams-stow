@@ -4,14 +4,17 @@ let
   hs = haskellPackages.override {
         extension = self: super: rec {
         hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
-        lens = hsPkg "lens" "4.6";
         # required, not in Nix
+        # newer than in Nixpkgs
+        lens = hsPkg "lens" "4.7";
+        vectorSpace = hsPkg "vector-space" "0.9";
         # HEAD packages
-        # monoidExtras = self.callPackage ../../../monoid-extras {};
-        # active = self.callPackage ../../../active {};
-        # diagramsCore = self.callPackage ../../../core {};
-        # diagramsLib = self.callPackage ../../../lib {};
-        # diagramsSvg = self.callPackage ../../../svg {};
+        vectorSpacePoints = self.callPackage ../../../vector-space-points {};
+        diagramsCore = self.callPackage ../../../core {};
+        diagramsLib = self.callPackage ../../../lib {};
+        diagramsCairo = self.callPackage ../../../cairo {};
+        diagramsPostscript = self.callPackage ../../../postscript {};
+        diagramsSvg = self.callPackage ../../../svg {};
         diagramsBuilder = self.callPackage ../../../builder {};
         # self
         diagramsHaddock= self.callPackage ./. {};

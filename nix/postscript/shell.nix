@@ -6,10 +6,10 @@ let
         hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
         # required, not in Nix
         # newer than Nix
-        semigroups = hsPkg "semigroups" "0.16";
+        lens = hsPkg "lens" "4.7";
+        vectorSpace = hsPkg "vector-space" "0.9";
         # HEAD packages
-        # monoidExtras = self.callPackage ../../../monoid-extras {};
-        # active = self.callPackage ../../../active {};
+        vectorSpacePoints = self.callPackage ../../../vector-space-points {};
         diagramsCore= self.callPackage ../../../core {};
         diagramsLib= self.callPackage ../../../lib {};
         # self
