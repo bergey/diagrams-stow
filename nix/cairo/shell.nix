@@ -1,21 +1,13 @@
-{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellPackages }:
+{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellngPackages }:
 
 let 
-  tmpHaskellPkgs= haskellPackages.override {
-     extension = self: super: rec {
-        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
-        # required, not in Nix
-        # HEAD packages
-        # monoidExtras = self.callPackage ../../../monoid-extras {};
-        active = self.callPackage ../../../active {};
-        diagramsCore = self.callPackage ../../../core {};
-        diagramsLib = self.callPackage ../../../lib {};
-        # self
-        diagramsCairo = self.callPackage ./. {};
+  hs = haskellPackages.override {
+        overrides = self: super: rec {
+          hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+          diagrams-core = self.callPackage ../../../core {};
+          diagrams-lib = self.callPackage ../../../lib {};
+          statestack = self.callPackage ../../../statestack {};
+          thisPackage = self.callPackage ./. {};
       };
     };
-  in let
-     haskellPackages = tmpHaskellPkgs;
-     in pkgs.lib.overrideDerivation haskellPackages.diagramsCairo (attrs: {
-       buildInputs = [ haskellPackages.cabalInstall ] ++ attrs.buildInputs;
- })
+  in hs.thisPackage.env

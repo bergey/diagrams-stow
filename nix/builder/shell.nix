@@ -1,25 +1,25 @@
-{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellPackages }:
+{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellngPackages }:
+
+with pkgs.haskell-ng.lib;
 
 let 
   hs = haskellPackages.override {
-        extension = self: super: rec {
-        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
-        # required, not in Nix
-        # newer versions
-        lens = hsPkg "lens" "4.7";
-        linear = hsPkg "linear" "1.16";
-        # HEAD packages        
-        monoidExtras = self.callPackage ../../../monoid-extras {};
-        active = self.callPackage ../../../active {};
-        diagramsCore = self.callPackage ../../../core {};
-        diagramsLib = self.callPackage ../../../lib {};
-        diagramsCairo = self.callPackage ../../../cairo {};
-        diagramsPostscript = self.callPackage ../../../postscript {};
-        diagramsSvg = self.callPackage ../../../svg {};
-        # self
-        diagramsBuilder = self.callPackage ./. {};
+        overrides = self: super: rec {
+          hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+          # required, not in Nix
+          # version pins
+          # other fixes
+          Rasterific = dontCheck super.Rasterific;
+          # HEAD packages
+          active = self.callPackage ../../../active {};
+          diagrams-core = self.callPackage ../../../core {};
+          diagrams-lib = self.callPackage ../../../lib {};
+          diagrams-cairo = self.callPackage ../../../cairo {};
+          diagrams-postscript = self.callPackage ../../../postscript {};
+          diagrams-svg = self.callPackage ../../../svg {};
+          diagrams-rasterific = self.callPackage ../../../rasterific {};
+          # self
+          thisPackage = self.callPackage ./. {};
       };
     };
-         in pkgs.lib.overrideDerivation hs.diagramsBuilder (attrs: {
-                buildInputs = [hs.cabalInstall ] ++ attrs.buildInputs;
- })
+  in hs.thisPackage.env

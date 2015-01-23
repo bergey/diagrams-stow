@@ -1,16 +1,11 @@
-{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellPackages }:
+{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellngPackages }:
 
 let 
   hs = haskellPackages.override {
-        extension = self: super: rec {
+        overrides = self: super: rec {
           hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
-          lens = hsPkg "lens" "4.7";
-          linear = hsPkg "linear" "1.16";
-          diagramsCore = self.callPackage ../../../core {};
+          diagrams-core = self.callPackage ../../../core {};
           thisPackage = self.callPackage ./. {};
       };
     };
-  in
-      pkgs.lib.overrideDerivation hs.thisPackage (attrs: {
-       buildInputs = [hs.cabalInstall ] ++ attrs.buildInputs;
- })
+  in hs.thisPackage.env

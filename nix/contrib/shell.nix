@@ -1,24 +1,14 @@
-{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellPackages }:
+{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellngPackages }:
 
 let 
-  tmpHaskellPkgs= haskellPackages.override {
-        extension = self: super: rec {
-        hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
-        # required, not in Nix
-        # newer than Nix
-        lens = hsPkg "lens" "4.7";
-        linear = hsPkg "linear" "1.16";
-        # HEAD packages
-        active = self.callPackage ../../../active {};
-        forceLayout = self.callPackage ../../../force-layout {};
-        diagramsCore = self.callPackage ../../../core {};
-        diagramsLib = self.callPackage ../../../lib {};
-        # self
-        thisPackage = self.callPackage ./. {};
+  hs = haskellPackages.override {
+        overrides = self: super: rec {
+          hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+          diagrams-core = self.callPackage ../../../core {};
+          diagrams-lib = self.callPackage ../../../lib {};
+          force-layout = self.callPackage ../../../force-layout {};
+          active = self.callPackage ../../../active {};
+          thisPackage = self.callPackage ./. {};
       };
     };
-  in let
-     haskellPackages = tmpHaskellPkgs;
-          in pkgs.lib.overrideDerivation haskellPackages.thisPackage (attrs: {
-       buildInputs = [ haskellPackages.cabalInstall ] ++ attrs.buildInputs;
- })
+  in hs.thisPackage.env

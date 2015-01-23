@@ -1,13 +1,10 @@
-{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellPackages }:
+{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellngPackages }:
 
 let 
-  tmpHaskellPkgs= haskellPackages.override {
-        extension = self: super: {
-        statestack = self.callPackage ./. {};
+  hs = haskellPackages.override {
+        overrides = self: super: rec {
+          hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+          thisPackage = self.callPackage ./. {};
       };
     };
-  in let
-     haskellPackages = tmpHaskellPkgs;
-     in pkgs.lib.overrideDerivation haskellPackages.statestack (attrs: {
-       buildInputs = [ haskellPackages.cabalInstall ] ++ attrs.buildInputs;
- })
+  in hs.thisPackage.env
