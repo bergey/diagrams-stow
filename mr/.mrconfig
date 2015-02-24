@@ -105,3 +105,7 @@ checkout = git clone 'git@github.com:ekmett/linear.git' 'linear'
 
 [pgf]
 checkout = git clone 'git@github.com:diagrams/diagrams-pgf.git' 'pgf'
+
+# This is self-referential; useful for updating, but not for initial download.
+[stow]
+checkout = git clone 'git@github.com:bergey/diagrams-stow.git' 'stow'

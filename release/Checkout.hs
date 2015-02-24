@@ -35,4 +35,5 @@ branches =
     , ("SVGFonts", "SVGFonts-1.3")
     , ("builder", "builder-0.6")
     , ("haddock", "haddock-0.2")
+    , ("stow", "release")
     ]
