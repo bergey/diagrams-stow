@@ -1,6 +1,6 @@
 { mkDerivation, adjunctions, base, containers, distributive
 , dual-tree, lens, linear, monoid-extras, mtl, semigroups, stdenv
-, unordered-containers, haddock-api
+, unordered-containers
 }:
 mkDerivation {
   pname = "diagrams-core";
@@ -8,7 +8,7 @@ mkDerivation {
   src = ./.;
   buildDepends = [
     adjunctions base containers distributive dual-tree lens linear
-    monoid-extras mtl semigroups unordered-containers haddock-api
+    monoid-extras mtl semigroups unordered-containers
   ];
   homepage = "http://projects.haskell.org/diagrams";
   description = "Core libraries for diagrams EDSL";

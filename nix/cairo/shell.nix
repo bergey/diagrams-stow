@@ -1,9 +1,20 @@
-{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskellngPackages }:
+{ pkgs ? import <nixpkgs> {}, haskellPackages ? pkgs.haskell-ng.packages.ghc7101 }:
+
+with pkgs.haskell-ng.lib;
 
 let 
   hs = haskellPackages.override {
         overrides = self: super: rec {
           hsPkg = pkg: version: self.callPackage "/home/bergey/code/nixHaskellVersioned/${pkg}/${version}.nix" {};
+          # version pins
+          prelude-extras = dontCheck super.prelude-extras;
+          fingertree = dontCheck super.fingertree;
+          lens = dontCheck super.lens;
+          # HEAD packages
+          monoid-extras = self.callPackage ../../../monoid-extras {};
+          active = self.callPackage ../../../active {};
+          dual-tree = self.callPackage ../../../dual-tree {};
+          diagrams-solve = self.callPackage ../../../solve {};
           diagrams-core = self.callPackage ../../../core {};
           diagrams-lib = self.callPackage ../../../lib {};
           statestack = self.callPackage ../../../statestack {};
