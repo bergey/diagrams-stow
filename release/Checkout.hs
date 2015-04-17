@@ -25,6 +25,7 @@ checkout (dir, branch) = chdir dir $
 branches :: [(FilePath, Text)]
 branches =
     [ ("active", "active-0.1")
+    , ("monoid-extras", "monoid-extras-0.3")
     , ("force-layout", "force-layout-0.3")
     , ("core", "core-1.2")
     , ("lib", "lib-1.2")
