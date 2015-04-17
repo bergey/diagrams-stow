@@ -1,3 +1,3 @@
- for pkg in active core lib contrib statestack svg cairo postscript rasterific canvas SVGFonts builder haddock docutils povray; do
+ for pkg in  monoid-extras dual-tree core active solve lib SVGFonts palette force-layout contrib statestack cairo gtk postscript rasterific svg canvas html5 diagrams builder haddock; do
      packdeps $pkg/*.cabal
 done
