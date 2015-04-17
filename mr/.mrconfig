@@ -112,3 +112,6 @@ checkout = git clone 'git@github.com:bergey/diagrams-stow.git' 'stow'
 
 [solve]
 checkout = git clone 'git@github.com:diagrams/diagrams-solve.git' 'solve'
+
+[html5]
+checkout = git clone 'git@github.com:diagrams/diagrams-html5.git' 'html5'
