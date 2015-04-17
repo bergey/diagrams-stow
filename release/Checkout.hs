@@ -1,19 +1,18 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
 
 -- | Checkout release branches of Diagrams packages.
 
 module Main where
 
-import Prelude hiding
-    (foldl, foldl1, foldr, foldr1
-    , mapM, mapM_, sequence, sequence_
-    , head, tail, last, init, map, (++), (!!), FilePath, lines)
+import           Prelude       hiding (FilePath, foldl, foldl1, foldr, foldr1,
+                                head, init, last, lines, map, mapM, mapM_,
+                                sequence, sequence_, tail, (!!), (++))
 
-import Data.Text hiding (map, filter)
-import Data.Foldable
-import Shelly
+import           Data.Foldable
+import           Data.Text     hiding (filter, map)
+import           Shelly
 
 main :: IO ()
 main = shelly $ mapM_ checkout branches
