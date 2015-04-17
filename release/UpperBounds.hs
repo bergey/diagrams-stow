@@ -7,6 +7,7 @@ module Main where
 
 import           Control.Monad
 import           Data.Foldable
+import           Data.List.Split           (splitWhen)
 import           Data.Semigroup
 import           Data.Text                 (Text)
 import qualified Data.Text                 as T
@@ -17,38 +18,18 @@ import           Shelly
 
 import           Prelude                   hiding (FilePath)
 
-repos :: [FilePath]
-repos =
-    [ "monoid-extras"
-    , "dual-tree"
-    , "core"
-    , "active"
-    , "solve"
-    , "lib"
-    , "SVGFonts"
-    , "palette"
-    , "force-layout"
-    , "contrib"
-    , "statestack"
-    , "cairo"
-    , "gtk"
-    , "postscript"
-    , "rasterific"
-    , "svg"
-    , "canvas"
-    , "html5"
-    , "builder"
-    , "haddock"
-    ]
+main :: IO ()
+main = shelly $ do
+    goals <- filterM (needsUpdate example) repos
+    echo "preparing to update .cabal files for:"
+    echo $ T.unwords $ map toTextIgnore goals
+    traverse_ (updateCabal example) goals
+    cleanBuild repos
 
 data Package = Pkg
                { name    :: Text
                , version :: Text
                }
-
--- TODO parse "package<version" from argument
-
-example = Pkg "lens" "4.11"
 
 cabalFilename :: FilePath -> Sh FilePath
 cabalFilename repo = do
@@ -76,9 +57,66 @@ updateCabal (Pkg pkg v) repo = do
     -- TODO Don't use regexen
     cmd "sed" "-i" (mconcat ["s/\\(", pkg, ".*\\)< [0-9\\.]*/\\1< ", v, "/"]) fn
 
-main :: IO ()
-main = shelly $ do
-    goals <- filterM (needsUpdate example) repos
-    echo "preparing to update .cabal files for:"
-    echo $ T.unwords $ map toTextIgnore goals
-    traverse_ (updateCabal example) goals
+cabal_ :: Text -> [Text] -> Sh ()
+cabal_ = command1_ "cabal" []
+
+cabal :: Text -> [Text] -> Sh Text
+cabal = command1 "cabal" []
+
+createSandbox  :: Sh ()
+createSandbox = cabal_ "sandbox" ["init"]
+
+addSource :: [Text] -> Sh ()
+addSource [] = return ()
+addSource dirs = command_ "cabal" ["sandbox", "add-source"] dirs
+
+getAddSource :: Sh [Text]
+getAddSource = do
+    inSandbox <- test_f "cabal.sandbox.config"
+    if inSandbox then do
+        cout <- cabal "sandbox" ["list-sources"]
+        return $ case splitWhen T.null (T.lines cout) of
+            (_:dirs: _) -> dirs -- middle of 3
+            _ -> []
+        else return []
+
+cleanSandbox :: Sh ()
+cleanSandbox = do
+    dirs <- getAddSource
+    cabal_ "sandbox" ["delete"]
+    createSandbox
+    addSource dirs
+
+cleanBuild :: [FilePath] -> Sh ()
+cleanBuild repos =  do
+    cleanSandbox
+    cabal_ "install" $ map (flip T.snoc '/' . toTextIgnore) repos
+
+    -- Hardcoded for development; should be read from CLI
+
+repos :: [FilePath]
+repos =
+    [ "monoid-extras"
+    , "dual-tree"
+    , "core"
+    , "active"
+    , "solve"
+    , "lib"
+    , "SVGFonts"
+    , "palette"
+    , "force-layout"
+    , "contrib"
+    , "statestack"
+    , "cairo"
+    , "gtk"
+    , "postscript"
+    , "rasterific"
+    , "svg"
+    , "canvas"
+    , "html5"
+    , "builder"
+    , "haddock"
+    ]
+
+-- TODO parse "package<version" from argument
+example = Pkg "lens" "4.11"
