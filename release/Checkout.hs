@@ -23,18 +23,33 @@ checkout (dir, branch) = chdir dir $
 
 branches :: [(FilePath, Text)]
 branches =
-    [ ("active", "active-0.1")
-    , ("monoid-extras", "monoid-extras-0.3")
-    , ("force-layout", "force-layout-0.3")
-    , ("core", "core-1.2")
-    , ("lib", "lib-1.2")
-    , ("contrib", "contrib-1.1")
-    , ("cairo", "cairo-1.2")
-    , ("canvas", "canvas-0.3")
-    , ("postscript", "postscript-1.1")
-    , ("rasterific", "rasterific-0.1")
-    , ("svg", "svg-1.1")
+    -- smaller dependencies
+    [ ("monoid-extras", "master")
+    , ("dual-tree", "master")
+    , ("active", "master")
+    , ("force-layout", "master")
+    , ("palette", "master")
     , ("SVGFonts", "master")
-    , ("builder", "builder-0.6")
-    , ("haddock", "haddock-0.2")
+    , ("solve", "master")
+    , ("statestack", "master")
+      -- core packages
+    , ("core", "master")
+    , ("lib", "lib-1.3")
+    , ("contrib", "master")
+      -- Backend Deps
+      -- ("texrunner", )
+      -- ("lucid-svg", )
+      -- ("static-canvas", )
+      -- Backends
+    , ("cairo", "master")
+    , ("gtk", "master")
+    -- , ("html5", )
+    -- , ("canvas", "canvas-0.3")
+    , ("postscript", "postscript-1.3")
+    -- , ("pgf", )
+    , ("rasterific", "rasterific-1.3")
+    , ("svg", "master")
+      -- builder
+    , ("builder", "master")
+    , ("haddock", "master")
     ]
