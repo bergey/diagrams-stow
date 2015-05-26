@@ -7,6 +7,7 @@
 
 module Main where
 
+import Control.Lens
 import           Control.Monad
 import           Data.Foldable
 import           Data.List.Split                       (splitWhen)
@@ -22,6 +23,10 @@ import           Shelly
 import qualified Options.Applicative as O
 import qualified Options.Applicative.Types as O
 import Control.Monad.Trans.Reader
+import Text.Trifecta
+import qualified Data.Map.Strict as M
+
+import GitConfig
 
 -- TODO imports for GHC < 7.10?
 
@@ -173,7 +178,8 @@ commitChanges :: Package -> FilePath -> Sh ()
 commitChanges pkg repo = chdir repo $ do
     -- .cabal file already changed
     gitCommit $ "cabal: allow " <> formatPkg pkg
-    fn <- cabalFilename =<< pwd
+    wDir <- pwd
+    fn <- cabalFilename wDir
     description <- liftIO $ C.readPackageDescription C.normal . FP.encodeString $ fn
     let oldVer = C.packageVersion description
     let newVer = bumpVersion oldVer
@@ -181,9 +187,17 @@ commitChanges pkg repo = chdir repo $ do
     gitCommit $ "bump version to " <> showVersion newVer
     (clFN, oldCL) <- readChangelog
     date <- today
-    writefile clFN $
-        header <> changelog newVer oldVer date pkg <> trimChangelog oldCL
-    gitCommit $ "CHANGELOG for " <> showVersion newVer
+    mayGitConfig <- parseGitConfig wDir
+    case mayGitConfig of
+     Nothing -> errorExit $ "Could not find git config in " <> toTextIgnore wDir
+     Just gc -> case M.lookup (Remote "origin") gc >>= M.lookup "url" of
+         Nothing -> errorExit $ "Could not find origin URL in git config"
+         Just url -> case preview _Success . parseString githubUrl mempty . T.unpack $ url of
+             Nothing -> errorExit $ "Could not parse as github URL: " <> url
+             Just ghUrl -> do
+                 writefile clFN $
+                     changelog newVer oldVer date pkg ghUrl oldCL
+                 gitCommit $ "CHANGELOG for " <> showVersion newVer
 
 header :: Text
 header = "# Change Log\n"
@@ -206,7 +220,7 @@ bumpVersion (C.Version ns tags) = C.Version ns' tags where
       [a,b,c] -> [a,b,c,1]
       (a:b:c:d:e) -> (a:b:c:d+1:e)
 
-changelog :: C.Version -> Text -> Package -> Text
+-- changelog :: C.Version -> Text -> Package -> Text
 -- changelog newVer date pkg =
 --     mconcat ["## ", showVersion newVer, " (", date, ")\n"
 --             , "\n"
@@ -214,13 +228,14 @@ changelog :: C.Version -> Text -> Package -> Text
 --             , "\n"
 --             ]
 -- new-style generated from git history
-changelog :: C.Version -> C.Version -> Text -> Package -> Text
-changlog newVer oldVer date pkg =
+changelog :: C.Version -> C.Version -> Text -> Package -> GithubUrl -> Text -> Text
+changelog newVer oldVer date pkg (GithubUrl _ user repo) oldCL =
     mconcat ["## [v", showVersion newVer,
-             "](https://github.com/diagrams/diagrams-core/tree/v", showVersion newVer,
+             "](https://github.com/", user, "/", repo, "/tree/v", showVersion newVer,
              ") (", date, ")\n\n",
-             "[Full Changelog](https://github.com/diagrams/diagrams-core/compare/v",
-             showVersion newVer, "...v", showVersion oldVer, ")\n\n"
+             "[Full Changelog](https://github.com/", user, "/", repo, "/compare/v",
+             showVersion oldVer, "...v", showVersion newVer, ")\n\n",
+             trimChangelog oldCL
              ]
 
 readChangelog :: Sh (FilePath, Text)
@@ -233,29 +248,3 @@ readChangelog = do
          contents <- readfile fn
          return (fn, contents)
      fns -> errorExit $ "Could not choose among: " <> T.unwords (map toTextIgnore fns)
-
-    -- Hardcoded for development; should be read from CLI
-
-diagramsRepos :: [FilePath]
-diagramsRepos =
-    [ "monoid-extras"
-    , "dual-tree"
-    , "core"
-    , "active"
-    , "solve"
-    , "lib"
-    , "SVGFonts"
-    , "palette"
-    , "force-layout"
-    , "contrib"
-    , "statestack"
-    , "cairo"
-    , "gtk"
-    , "postscript"
-    , "rasterific"
-    , "svg"
-    , "canvas"
-    , "html5"
-    , "builder"
-    , "haddock"
-    ]
