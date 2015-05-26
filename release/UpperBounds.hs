@@ -238,11 +238,17 @@ changelog newVer oldVer date pkg (GithubUrl _ user repo) oldCL =
              trimChangelog oldCL
              ]
 
+changelogNames :: FilePath -> Bool
+changelogNames fp = e (FP.extension fp) && b (toTextIgnore . FP.basename $ fp)
+  where
+    e ext = ext `elem` [Nothing, Just "md", Just "markdown"]
+    b name = name `elem` ["CHANGES", "CHANGELOG"]
+
 readChangelog :: Sh (FilePath, Text)
 readChangelog = do
     dir <- pwd
     fns <- ls dir
-    case filter (T.isPrefixOf "CHANGE" . toTextIgnore . FP.filename) fns of
+    case filter changelogNames fns of
      [] -> errorExit $ "Could not find Changelog in " <> toTextIgnore dir
      [fn] -> do
          contents <- readfile fn
