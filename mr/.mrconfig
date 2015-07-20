@@ -115,3 +115,6 @@ checkout = git clone 'git@github.com:diagrams/diagrams-solve.git' 'solve'
 
 [html5]
 checkout = git clone 'git@github.com:diagrams/diagrams-html5.git' 'html5'
+
+[package-ops]
+checkout = git clone 'git@github.com:diagrams/package-ops.git' 'package-ops'
