@@ -1,16 +1,18 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- | Bump upper bounds in .cabal files, update changelogs, commit to git.
 
 module Main where
 
-import Control.Lens
+import           Control.Lens
 import           Control.Monad
+import           Control.Monad.Trans.Reader
 import           Data.Foldable
 import           Data.List.Split                       (splitWhen)
+import qualified Data.Map.Strict                       as M
 import           Data.Semigroup
 import           Data.Text                             (Text)
 import qualified Data.Text                             as T
@@ -19,14 +21,12 @@ import qualified Distribution.PackageDescription.Parse as C
 import qualified Distribution.Verbosity                as C
 import qualified Distribution.Version                  as C
 import qualified Filesystem.Path.CurrentOS             as FP
+import qualified Options.Applicative                   as O
+import qualified Options.Applicative.Types             as O
 import           Shelly
-import qualified Options.Applicative as O
-import qualified Options.Applicative.Types as O
-import Control.Monad.Trans.Reader
-import Text.Trifecta
-import qualified Data.Map.Strict as M
+import           Text.Trifecta
 
-import GitConfig
+import           GitConfig
 
 -- TODO imports for GHC < 7.10?
 
@@ -47,17 +47,21 @@ runActions config = do
     when (doCabal config) $ updateGoals goals (package config)
     when (doClean config) $ cleanSandbox
     when (doBuild config) $ cabalBuild goals
-    when (doGit config) $ traverse_ (commitChanges $ package config) goals
+    when (doCommitCabal config) $ traverse_ (commitCabalChanges $ package config) goals
+    when (doCommitChangelog config) $ traverse_ commitChangelog goals
+    when (doCommitVersion config) $ traverse_ commitVersionBump goals
     echo "The following packages were modified:"
     echo $ T.unwords $ map toTextIgnore goals
 
 data Config = Config
-              { package :: Package -- -p
-              , repos   :: [FilePath]
-              , doCabal :: Bool -- -d
-              , doClean :: Bool -- -l
-              , doBuild :: Bool -- -b
-              , doGit   :: Bool -- -g
+              { package           :: Package -- -p
+              , repos             :: [FilePath]
+              , doCabal           :: Bool -- -d
+              , doClean           :: Bool -- -l
+              , doBuild           :: Bool -- -b
+              , doCommitCabal     :: Bool -- -g
+              , doCommitChangelog :: Bool -- c
+              , doCommitVersion   :: Bool -- V
               }
 
 data Package = Pkg
@@ -72,7 +76,9 @@ cliParser = Config
             <*> O.switch (O.long "cabal" <> O.short 'd' <> O.help "update .cabal files with the new dependency")
             <*> O.switch (O.long "clean" <> O.short 'l' <> O.help "delete a cabal sandbox in the current working directory, and restore, preserving add-source dependencies")
             <*> O.switch (O.long "build" <> O.short 'b' <> O.help "cabal install the specified directories")
-            <*> O.switch (O.long "git" <> O.short 'g' <> O.help "Commit all changes, then bump version, commit, update Changelog, commit")
+            <*> O.switch (O.long "git" <> O.short 'g' <> O.help "Commit all changes, with a message about package bounds")
+            <*> O.switch (O.long  "changes" <> O.short 'c' <> O.help "update Changelog, commit")
+            <*> O.switch (O.long "bump" <> O.short 'V' <> O.help "bump version & commit")
 
 instance Monoid (O.Mod f a) => Semigroup (O.Mod f a) where
     (<>) = mappend
@@ -174,30 +180,46 @@ today = T.strip <$> cmd "date" "+%F"
 gitCommit :: Text -> Sh ()
 gitCommit msg  = cmd "git" "commit" "-am" msg
 
-commitChanges :: Package -> FilePath -> Sh ()
-commitChanges pkg repo = chdir repo $ do
+commitCabalChanges :: Package -> FilePath -> Sh ()
+commitCabalChanges pkg repo = chdir repo $ do
     -- .cabal file already changed
     gitCommit $ "cabal: allow " <> formatPkg pkg
-    wDir <- pwd
-    fn <- cabalFilename wDir
-    description <- liftIO $ C.readPackageDescription C.normal . FP.encodeString $ fn
-    let oldVer = C.packageVersion description
+
+getPackageVersion :: FilePath -> Sh C.Version
+getPackageVersion repo = do
+  fn <- cabalFilename repo
+  description <- liftIO $ C.readPackageDescription C.normal . FP.encodeString $ fn
+  return $ C.packageVersion description
+
+commitChangelog :: FilePath -> Sh ()
+commitChangelog repo' = chdir repo' $ do
+    repo <- pwd
+    oldVer <- getPackageVersion repo
     let newVer = bumpVersion oldVer
-    sed_ ["s/\\(^[Vv]ersion: *\\)[0-9\\.]*/\\1", showVersion newVer, "/"] fn
-    gitCommit $ "bump version to " <> showVersion newVer
     (clFN, oldCL) <- readChangelog
     date <- today
-    mayGitConfig <- parseGitConfig wDir
+    mayGitConfig <- parseGitConfig repo
     case mayGitConfig of
-     Nothing -> errorExit $ "Could not find git config in " <> toTextIgnore wDir
+     Nothing -> errorExit $ "Could not find git config in " <> toTextIgnore repo
      Just gc -> case M.lookup (Remote "origin") gc >>= M.lookup "url" of
          Nothing -> errorExit $ "Could not find origin URL in git config"
          Just url -> case preview _Success . parseString githubUrl mempty . T.unpack $ url of
              Nothing -> errorExit $ "Could not parse as github URL: " <> url
              Just ghUrl -> do
                  writefile clFN $
-                     changelog newVer oldVer date pkg ghUrl oldCL
+                     changelog newVer oldVer date ghUrl oldCL
                  gitCommit $ "CHANGELOG for " <> showVersion newVer
+
+-- commit Changelog before version bump so we can identify oldVer
+-- TODO make this more robust, looking more places (git history? tags?) for oldVer
+commitVersionBump :: FilePath -> Sh ()
+commitVersionBump repo' = chdir repo' $ do
+    repo <- pwd
+    fn <- cabalFilename repo
+    oldVer <- getPackageVersion repo
+    let newVer = bumpVersion oldVer
+    sed_ ["s/\\(^[Vv]ersion: *\\)[0-9\\.]*/\\1", showVersion newVer, "/"] fn
+    gitCommit $ "bump version to " <> showVersion newVer
 
 header :: Text
 header = "# Change Log\n"
@@ -228,8 +250,8 @@ bumpVersion (C.Version ns tags) = C.Version ns' tags where
 --             , "\n"
 --             ]
 -- new-style generated from git history
-changelog :: C.Version -> C.Version -> Text -> Package -> GithubUrl -> Text -> Text
-changelog newVer oldVer date pkg (GithubUrl _ user repo) oldCL =
+changelog :: C.Version -> C.Version -> Text -> GithubUrl -> Text -> Text
+changelog newVer oldVer date (GithubUrl _ user repo) oldCL =
     mconcat ["## [v", showVersion newVer,
              "](https://github.com/", user, "/", repo, "/tree/v", showVersion newVer,
              ") (", date, ")\n\n",
