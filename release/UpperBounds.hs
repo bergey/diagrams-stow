@@ -7,6 +7,11 @@
 
 module Main where
 
+import           Distribution.Ops.Cabal
+import           Ops.Changelog
+import           Ops.Common
+
+import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.Trans.Reader
@@ -16,8 +21,10 @@ import qualified Data.Map.Strict                       as M
 import           Data.Semigroup
 import           Data.Text                             (Text)
 import qualified Data.Text                             as T
+import qualified Data.Version                          as C
 import qualified Distribution.Package                  as C
 import qualified Distribution.PackageDescription.Parse as C
+import           Distribution.Text                     (simpleParse)
 import qualified Distribution.Verbosity                as C
 import qualified Distribution.Version                  as C
 import qualified Filesystem.Path.CurrentOS             as FP
@@ -31,6 +38,8 @@ import           GitConfig
 -- TODO imports for GHC < 7.10?
 
 import           Prelude                               hiding (FilePath)
+
+-- CLI specific code; do not move to package-ops
 
 main :: IO ()
 main = do
@@ -54,7 +63,7 @@ runActions config = do
     echo $ T.unwords $ map toTextIgnore goals
 
 data Config = Config
-              { package           :: Package -- -p
+              { package           :: C.PackageIdentifier -- -p
               , repos             :: [FilePath]
               , doCabal           :: Bool -- -d
               , doClean           :: Bool -- -l
@@ -63,11 +72,6 @@ data Config = Config
               , doCommitChangelog :: Bool -- c
               , doCommitVersion   :: Bool -- V
               }
-
-data Package = Pkg
-               { name    :: Text
-               , version :: Text
-               }
 
 cliParser :: O.Parser Config
 cliParser = Config
@@ -93,51 +97,38 @@ helpParser = O.info (O.helper <*> cliParser)
              <> O.header "upper-bounds - point release automation for Haskell")
 
 -- TODO more validation that this looks like a package constraint
-parsePackage :: O.ReadM Package
-parsePackage = O.ReadM . asks $ \input ->
-  let (n, v) = break (== '<') input in
-   Pkg (T.pack n) (T.pack $ tail v)
+parsePackage :: O.ReadM C.PackageIdentifier
+parsePackage = O.ReadM  $ do
+  input <- ask
+  case simpleParse input of
+    Just pkg -> return pkg
+    Nothing -> mzero
+
+  -- let (n, v) = break (== '<') input in
+  --  Pkg (T.pack n) (T.pack $ tail v)
 
 parseFilepath :: O.ReadM FP.FilePath
 parseFilepath = O.ReadM . asks $ FP.fromText . T.pack
 
-formatPkg :: Package -> Text
-formatPkg (Pkg n v) = mconcat [n, "-", v]
+formatPkg :: C.PackageIdentifier -> Text
+formatPkg (C.PackageIdentifier (C.PackageName n) v) =
+  mconcat [T.pack n, "-", showVersion v]
 
-cabalFilename :: FilePath -> Sh FilePath
-cabalFilename repo = do
-    files <- ls repo
-    case filter (`FP.hasExtension` "cabal") files of
-      (fn:_) -> return fn
-      _ -> errorExit $ "Could not find .cabal file in: " <> toTextIgnore repo
+-- General Packaging code, may belong in package-ops, with cleanup.
 
--- | Test whether a given repo needs updating for the given package and version
-needsUpdate :: Package -> FilePath -> Sh Bool
-needsUpdate (Pkg pkg v) repo = errExit False $ do
-    fn <- cabalFilename repo
-    match <- cmd "grep" (pkg <> ".*<") fn
-    exit <- lastExitCode
-    case exit of
-      1 -> return False
-    -- pkg is used, but maybe all the lines are up to date
-      0 -> return . not $ all (v `T.isInfixOf`) (T.lines match)
-      _ -> errorExit $ "grep exited with code " <> (T.pack . show $ exit)
+-- -- TODO switch to findCabalFile from package-ops
+-- findCabalOrErr :: FilePath -> Sh FilePath
+-- findCabalOrErr repo = do
+--     mayFn <- findCabalOrErr repo
+--     case mayFn of
+--       Just fn -> return fn
+--       Nothing -> errorExit $ "Could not find .cabal file in: " <> toTextIgnore repo
 
-updateGoals :: [FilePath] -> Package -> Sh ()
+updateGoals :: [FilePath] -> C.PackageIdentifier -> Sh ()
 updateGoals goals pkg = do
     echo "preparing to update .cabal files for:"
     echo $ T.unwords $ map toTextIgnore goals
     traverse_ (updateCabal pkg) goals
-
--- | Modify a cabal file in place
-updateCabal :: Package -> FilePath -> Sh ()
-updateCabal (Pkg pkg v) repo = do
-    fn <- cabalFilename repo
-    -- TODO Don't use regexen
-    sed_ ["s/\\(", pkg, ".*\\)< [0-9\\.]*/\\1< ", v, "/"] fn
-
-sed_ :: [Text] -> FilePath -> Sh ()
-sed_ parts fn = cmd "sed" "-i" (mconcat parts) fn
 
 cabal_ :: Text -> [Text] -> Sh ()
 cabal_ = command1_ "cabal" []
@@ -180,14 +171,14 @@ today = T.strip <$> cmd "date" "+%F"
 gitCommit :: Text -> Sh ()
 gitCommit msg  = cmd "git" "commit" "-am" msg
 
-commitCabalChanges :: Package -> FilePath -> Sh ()
+commitCabalChanges :: C.PackageIdentifier -> FilePath -> Sh ()
 commitCabalChanges pkg repo = chdir repo $ do
     -- .cabal file already changed
     gitCommit $ "cabal: allow " <> formatPkg pkg
 
 getPackageVersion :: FilePath -> Sh C.Version
 getPackageVersion repo = do
-  fn <- cabalFilename repo
+  fn <- findCabalOrErr repo
   description <- liftIO $ C.readPackageDescription C.normal . FP.encodeString $ fn
   return $ C.packageVersion description
 
@@ -215,7 +206,7 @@ commitChangelog repo' = chdir repo' $ do
 commitVersionBump :: FilePath -> Sh ()
 commitVersionBump repo' = chdir repo' $ do
     repo <- pwd
-    fn <- cabalFilename repo
+    fn <- findCabalOrErr repo
     oldVer <- getPackageVersion repo
     let newVer = bumpVersion oldVer
     sed_ ["s/\\(^[Vv]ersion: *\\)[0-9\\.]*/\\1", showVersion newVer, "/"] fn
@@ -230,17 +221,11 @@ trimChangelog oldCL = case T.lines oldCL of
     ("# Change Log":rest) -> T.unlines $ dropWhile (\l -> T.strip l == "") rest
     _ -> oldCL
 
-showVersion :: C.Version -> Text
-showVersion (C.Version ns _tags) = T.intercalate "." $ map (T.pack . show) ns
+-- showVersion :: C.Version -> Text
+-- showVersion (C.Version ns _tags) = T.intercalate "." $ map (T.pack . show) ns
 
 bumpVersion :: C.Version -> C.Version
-bumpVersion (C.Version ns tags) = C.Version ns' tags where
-  ns' = case ns of
-      [] -> [0,0,0,1] -- is this possible?
-      [a] -> [a,0,0,1]
-      [a,b] -> [a,b,0,1]
-      [a,b,c] -> [a,b,c,1]
-      (a:b:c:d:e) -> (a:b:c:d+1:e)
+bumpVersion = incVersion 4
 
 -- changelog :: C.Version -> Text -> Package -> Text
 -- changelog newVer date pkg =
@@ -260,19 +245,20 @@ changelog newVer oldVer date (GithubUrl _ user repo) oldCL =
              trimChangelog oldCL
              ]
 
-changelogNames :: FilePath -> Bool
-changelogNames fp = e (FP.extension fp) && b (toTextIgnore . FP.basename $ fp)
-  where
-    e ext = ext `elem` [Nothing, Just "md", Just "markdown"]
-    b name = name `elem` ["CHANGES", "CHANGELOG"]
+-- changelogNames :: FilePath -> Bool
+-- changelogNames fp = e (FP.extension fp) && b (toTextIgnore . FP.basename $ fp)
+--   where
+--     e ext = ext `elem` [Nothing, Just "md", Just "markdown"]
+--     b name = name `elem` ["CHANGES", "CHANGELOG"]
 
 readChangelog :: Sh (FilePath, Text)
 readChangelog = do
-    dir <- pwd
-    fns <- ls dir
-    case filter changelogNames fns of
-     [] -> errorExit $ "Could not find Changelog in " <> toTextIgnore dir
-     [fn] -> do
-         contents <- readfile fn
-         return (fn, contents)
-     fns -> errorExit $ "Could not choose among: " <> T.unwords (map toTextIgnore fns)
+  tryCl <- findChangelog
+  dir <- pwd
+  case tryCl of
+    Right fn -> do
+      contents <- readfile fn
+      return (fn, contents)
+    Left NoMatches -> errorExit $ "Could not find Changelog in " <> toTextIgnore dir
+    Left (MultipleMatches fns) -> errorExit $ "Could not choose among: " <>
+                                T.unwords (map toTextIgnore fns)

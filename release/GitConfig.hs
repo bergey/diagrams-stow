@@ -1,22 +1,23 @@
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE FlexibleContexts     #-}
 {-# LANGUAGE OverloadedStrings    #-}
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 -- | parse .git/config file for origin URL
 
 module GitConfig where
 
-import Control.Applicative
-import Data.Functor
-import Text.Trifecta
-import           Data.Text                             (Text)
-import qualified Data.Text                             as T
-import Data.Map.Strict as M
-import qualified Data.CharSet.Common as Chars
-import qualified Filesystem.Path.CurrentOS             as FP
+import           Control.Applicative
+import           Control.Lens              hiding (noneOf)
+import qualified Data.CharSet.Common       as Chars
+import           Data.Functor
+import           Data.Map.Strict           as M
+import           Data.Monoid
+import           Data.Text                 (Text)
+import qualified Data.Text                 as T
+import qualified Filesystem.Path.CurrentOS as FP
 import           Shelly
-import Control.Lens hiding (noneOf)
+import           Text.Trifecta
 
 data SectionHead = Core | Remote Text | Branch Text
                  deriving (Show, Ord, Eq)
