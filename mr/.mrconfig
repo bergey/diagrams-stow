@@ -100,7 +100,7 @@ checkout = git clone 'git@github.com:diagrams/diagrams-constraints.git' 'constra
 [bench]
 checkout = git clone 'git@github.com:diagrams/diagrams-bench.git' 'bench'
 
-[linear]
+[upstream/linear]
 checkout = git clone 'git@github.com:ekmett/linear.git' 'linear'
 
 [pgf]
