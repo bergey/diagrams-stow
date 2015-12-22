@@ -124,3 +124,6 @@ checkout = git clone 'git@github.com:ghcjs/diagrams-ghcjs.git' 'ghcjs'
 
 [reflex]
 checkout = git clone 'git@github.com:diagrams/diagrams-reflex' 'reflex'
+
+[pandoc]
+checkout = git clone 'git@github.com:diagrams/diagrams-pandoc' 'pandoc'
