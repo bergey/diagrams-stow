@@ -13,7 +13,8 @@ master` will switch to the master branch, and so forth.  This is a
 much larger set of repos than the mrconfig provided
 [on the wiki](http://www.haskell.org/haskellwiki/Diagrams/Contributing#Getting_the_code).
 This one includes everything that I consider to be collectively
-maintained by the Diagrams team.
+maintained by the Diagrams team.  Packages with names `diagrams-*`
+have the `diagrams-` prefix removed from the directory name.
 
 # packdeps
 
@@ -22,14 +23,9 @@ script that checks that upper bounds in a cabal file do not prevent
 using the latest released version.  The shell script here runs
 packdeps on most of the Diagrams packages.
 
-# Nix
+# stack
 
-[Nix derivations](http://nixos.org/nix) for all of the Diagrams
-packages.  I run `nix-shell --pure` in the package directory to enter
-a subshell with all necessary Haskell packages installed.  This
-provides sandboxing (like hsenv or cabal sandbox) and reduces rebuilds
-compared to always working in such a sandbox. In many cases, the
-`shell.nix` file specifies a particular version of a dependency, other
-than that in [nixpkgs](https://github.com/nixos/nixpkgs). The commands
-to generate the versioned Nix derivations are
-[in my nix configuration](https://github.com/bergey/nix-config).
+[stack](http://docs.haskellstack.org/en/stable/README.html) files for
+the Diagrams packages.  Each includes dependencies that are part of
+the Diagrams umbrela from local git repos.  The directory layout is
+the same as in the mr config in this repo.
