@@ -8,10 +8,10 @@ packages:
   - '.'
   - location:
       git: https://github.com/ryantrinkle/reflex-dom
-      commit: d778094352f99c5fa59770710eb6accb141550eb
+      commit: 4ce94d0afe35f5642e985800dd89fa457b324a07
   - location:
       git: https://github.com/reflex-frp/reflex-dom-contrib
-      commit: 531ce8b85ada1b10d5c79ff096d0aa8b0476b636
+      commit: 0dda030e53c0d0a351641dab8930965bc21e8288
 
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:
