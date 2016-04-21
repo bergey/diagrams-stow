@@ -127,3 +127,6 @@ checkout = git clone 'git@github.com:diagrams/diagrams-reflex' 'reflex'
 
 [pandoc]
 checkout = git clone 'git@github.com:diagrams/diagrams-pandoc' 'pandoc'
+
+[svg-builder]
+checkout = git clone 'https://github.com/diagrams/svg-builder' 'svg-builder'
